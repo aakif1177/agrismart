@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriSmart - Crop & Disease Assistant</title>
+    <meta name="description" content="Get personalized crop recommendations and identify plant diseases instantly using our rule-based expert system.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Authentication Screen -->
+    <section id="auth-section" class="section active full-screen">
+        
+        <!-- Login Card -->
+        <div id="login-card" class="auth-card">
+            <div class="auth-header">
+                <h2>🌿 AgriSmart</h2>
+                <p>Sign in to access advanced farming tools</p>
+            </div>
+            <div class="form-group">
+                <label for="login-username">Email or Username</label>
+                <input type="text" id="login-username" placeholder="Enter your email or username" />
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" placeholder="Enter your password" />
+            </div>
+            <button class="btn primary full-width" onclick="handleLogin()">Secure Login</button>
+            <p class="auth-switch">Don't have an account? <a href="#" onclick="toggleAuth('signup')">Sign Up</a></p>
+            <p id="login-error" class="error-text" style="display: none;">Invalid credentials. Please register first.</p>
+        </div>
+
+        <!-- Signup Card -->
+        <div id="signup-card" class="auth-card" style="display: none;">
+            <div class="auth-header">
+                <h2>🌿 AgriSmart</h2>
+                <p>Create your farmer account</p>
+            </div>
+            <div class="form-group">
+                <label for="signup-fullname">Full Name</label>
+                <input type="text" id="signup-fullname" placeholder="John Doe" />
+            </div>
+            <div class="form-group">
+                <label for="signup-email">Email Address</label>
+                <input type="email" id="signup-email" placeholder="example@email.com" />
+            </div>
+            <div class="form-group">
+                <label for="signup-username">Username</label>
+                <input type="text" id="signup-username" placeholder="Choose a username" />
+            </div>
+            <div class="form-group">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" placeholder="Create a password" />
+            </div>
+            <button class="btn primary full-width" onclick="handleSignup()">Create Account</button>
+            <p class="auth-switch">Already have an account? <a href="#" onclick="toggleAuth('login')">Sign In</a></p>
+            <p id="signup-error" class="error-text" style="display: none;">Please fill in all fields.</p>
+            <p id="signup-success" style="color: var(--primary-color); margin-top: 1rem; text-align: center; font-size: 0.95rem; font-weight: 600; display: none;">Account created! You can now log in.</p>
+        </div>
+        
+    </section>
+
+    <!-- Main Dashboard Application -->
+    <div id="app-container" style="display: none;">
+        <header>
+            <nav>
+                <div class="logo">🌿 AgriSmart</div>
+                <ul class="nav-links">
+                    <li><a href="#" class="active" onclick="showSection('home', this)">Home</a></li>
+                    <li><a href="#" onclick="showSection('recommendation', this)">Crop Rec.</a></li>
+                    <li><a href="#" onclick="showSection('disease', this)">Disease</a></li>
+                    <li><a href="#" onclick="showSection('fertilizer', this)">Fertilizer</a></li>
+                    <li><a href="#" onclick="showSection('watering', this)">Watering</a></li>
+                </ul>
+                <button class="btn logout-btn" onclick="handleLogout()">Log Out</button>
+            </nav>
+        </header>
+
+        <main>
+            <section id="home" class="section">
+                <div class="hero">
+                    <h1>Smart Farming Made Simple</h1>
+                    <p>Welcome back, <strong id="user-display-name" style="color: var(--primary-color);">Farmer</strong>! Get personalized crop recommendations, detect diseases, and now calculate organic fertilizer needs and watering schedules.</p>
+                    <div class="cta-buttons" style="flex-wrap: wrap;">
+                        <button class="btn primary" onclick="showSection('recommendation')">Recommend Crops</button>
+                        <button class="btn secondary" onclick="showSection('disease')">Detect Disease</button>
+                        <button class="btn secondary" onclick="showSection('fertilizer')">Fertilizer Guide</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="recommendation" class="section">
+                <h2>Crop Recommendation</h2>
+                <p>Select your soil type and current season to get the best crop suggestions to maximize yield.</p>
+                <div class="card form-container">
+                    <div class="form-group">
+                        <label for="soil-type">Soil Type</label>
+                        <select id="soil-type">
+                            <option value="">-- Select Soil Type --</option>
+                            <option value="sandy">Sandy</option>
+                            <option value="clay">Clay</option>
+                            <option value="loamy">Loamy</option>
+                            <option value="black">Black</option>
+                            <option value="red">Red</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="season">Season</label>
+                        <select id="season">
+                            <option value="">-- Select Season --</option>
+                            <option value="summer">Summer</option>
+                            <option value="winter">Winter</option>
+                            <option value="rainy">Rainy (Monsoon)</option>
+                        </select>
+                    </div>
+                    <button class="btn primary full-width" onclick="recommendCrops()">Get Recommendation</button>
+                    <div id="crop-result" class="result-box hidden"></div>
+                </div>
+            </section>
+
+            <section id="disease" class="section">
+                <h2>Disease Detection</h2>
+                <p>Identify plant issues manually or use your camera for an AI-simulated scan.</p>
+                <div class="card form-container">
+                    <div class="form-group">
+                        <label for="crop">Active Crop</label>
+                        <select id="crop" onchange="updateSymptoms()">
+                            <option value="">-- Select Crop --</option>
+                            <option value="wheat">Wheat</option>
+                            <option value="rice">Rice</option>
+                            <option value="cotton">Cotton</option>
+                            <option value="tomato">Tomato</option>
+                        </select>
+                    </div>
+
+                    <!-- Detection Method Tabs -->
+                    <div class="tabs" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                        <button id="tab-manual" class="btn secondary active" style="flex:1;" onclick="switchDiseaseTab('manual')">Manual Entry</button>
+                        <button id="tab-camera" class="btn secondary" style="flex:1;" onclick="switchDiseaseTab('camera')">Camera Scan</button>
+                    </div>
+
+                    <!-- Manual Mode -->
+                    <div id="mode-manual">
+                        <div class="form-group">
+                            <label for="symptoms">Visual Symptoms</label>
+                            <select id="symptoms" disabled>
+                                <option value="">-- Select Crop First --</option>
+                            </select>
+                        </div>
+                        <button class="btn primary full-width" onclick="detectDisease()">Analyze Symptoms</button>
+                    </div>
+
+                    <!-- Camera Mode -->
+                    <div id="mode-camera" style="display: none;">
+                        <div id="camera-container" style="background:#111; border-radius:12px; overflow:hidden; position:relative; min-height:250px; display:flex; align-items:center; justify-content:center; margin-bottom:1rem; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);">
+                            <!-- Video element for webcam -->
+                            <video id="webcam-feed" autoplay playsinline style="width:100%; display:none;"></video>
+                            <canvas id="snapshot-canvas" style="display:none; width:100%; object-fit: cover;"></canvas>
+                            
+                            <div id="camera-placeholder" style="color:#aaa; text-align:center; padding:2rem;">
+                                <span style="font-size:3rem;">📷</span><br>
+                                <p style="margin-top:0.5rem; font-size:0.9rem;">Camera is standing by</p>
+                            </div>
+
+                            <!-- Scanning overlay -->
+                            <div id="scan-overlay" style="display:none; position:absolute; inset:0; background:rgba(46,125,50,0.6); flex-direction:column; align-items:center; justify-content:center; color:white; backdrop-filter: blur(2px);">
+                                <div class="spinner"></div>
+                                <p style="margin-top:1rem; font-weight:600; letter-spacing: 1px;">ANALYZING LEAF BIOMETRICS...</p>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; flex-direction:column; gap:0.8rem;">
+                            <div style="display:flex; gap:1rem;">
+                                <button id="btn-start-cam" class="btn secondary" style="flex:1;" onclick="startCamera()">Start Camera</button>
+                                <button id="btn-capture" class="btn primary" style="flex:1;" onclick="captureAndAnalyze()" disabled>Capture & Analyze</button>
+                            </div>
+                            <div style="text-align:center; color:var(--text-light); font-size:0.9rem; margin: 0.3rem 0; font-weight:600;">— OR —</div>
+                            <div>
+                                <input type="file" id="image-upload" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+                                <button id="btn-upload" class="btn secondary full-width" style="margin-top:0;" onclick="document.getElementById('image-upload').click()">Upload Photo from Device</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="disease-result" class="result-box hidden"></div>
+                </div>
+            </section>
+
+            <section id="fertilizer" class="section">
+                <h2>Fertilizer Guide</h2>
+                <p>Rule-based nutrient advice mapping to soil architecture and crop demands.</p>
+                <div class="card form-container">
+                    <div class="form-group">
+                        <label for="fert-soil">Architecture type (Soil)</label>
+                        <select id="fert-soil">
+                            <option value="">-- Select Soil Type --</option>
+                            <option value="sandy">Sandy (Low retention)</option>
+                            <option value="clay">Clay (High retention)</option>
+                            <option value="loamy">Loamy (Balanced)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fert-crop">Crop Type</label>
+                        <select id="fert-crop">
+                            <option value="">-- Select Crop --</option>
+                            <option value="wheat">Wheat</option>
+                            <option value="rice">Rice</option>
+                            <option value="tomato">Tomato</option>
+                            <option value="cotton">Cotton</option>
+                        </select>
+                    </div>
+                    <button class="btn primary full-width" onclick="recommendFertilizer()">Get Fertilizer Scheme</button>
+                    <div id="fert-result" class="result-box hidden"></div>
+                </div>
+            </section>
+
+            <section id="watering" class="section">
+                <h2>Watering Schedule</h2>
+                <p>Calculate optimal irrigation periods ensuring hydration without water-logging.</p>
+                <div class="card form-container">
+                    <div class="form-group">
+                        <label for="water-crop">Active Crop</label>
+                        <select id="water-crop">
+                            <option value="">-- Select Crop --</option>
+                            <option value="wheat">Wheat</option>
+                            <option value="rice">Rice</option>
+                            <option value="tomato">Tomato</option>
+                            <option value="cotton">Cotton</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="water-season">Weather Season</label>
+                        <select id="water-season">
+                            <option value="">-- Select Weather --</option>
+                            <option value="summer">Summer (Dry)</option>
+                            <option value="winter">Winter (Cool)</option>
+                            <option value="rainy">Rainy (Humid)</option>
+                        </select>
+                    </div>
+                    <button class="btn primary full-width" onclick="getWateringGuide()">Calculate Schedule</button>
+                    <div id="water-result" class="result-box hidden"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
